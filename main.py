@@ -98,8 +98,20 @@ def callback():
     except Exception as e:
         print("❌ Error:", str(e))
         return jsonify({"error": str(e)}), 500
-    
+
+JSON_PATH = os.path.expanduser("~/Documents/OutlookStock/data_ready.json")   
+
 json_data = []  # ตัวแปรสำหรับเก็บ JSON ที่ upload เข้ามา
+
+if os.path.exists(JSON_PATH):
+    try:
+        with open(JSON_PATH, "r", encoding="utf-8") as f:
+            json_data = json.load(f)
+        print(f"✅ Loaded JSON from disk success")
+    except Exception as e:
+        print(f"❌ Failed to load JSON")
+else:
+    print("⚠️ ไม่มีไฟล์ JSON บน Disk")
 
 @app.before_request
 def log_uptime_ping():
@@ -126,17 +138,6 @@ def home():
         print(f"✅ UptimeRobot Ping at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         return "Ping จาก UptimeRobot", 200
     return "ระบบพร้อมทำงานแล้ว!", 200
-
-@app.route("/api/json-status", methods=["GET", "HEAD"])
-def json_status():
-    json_exists = os.path.exists("data_ready.json")
-    status_text = "✅ JSON พร้อมใช้งาน" if json_exists else "❌ ไม่พบไฟล์ JSON"
-    print(f"[UptimeRobot] Ping /api/json-status → {status_text}", flush=True)
-    
-    return (
-        jsonify({"json_exists": json_exists}),
-        200 if json_exists else 503  # ใช้ 503 ถ้าไม่มีไฟล์
-    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)  # ✅ debug=Truez   
