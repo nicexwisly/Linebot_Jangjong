@@ -8,6 +8,25 @@ import json
 
 app = Flask(__name__)
 
+def auto_upload_json_on_startup():
+    if os.path.exists(JSON_PATH):
+        try:
+            with open(JSON_PATH, "r", encoding="utf-8") as f:
+                json_content = json.load(f)
+
+            # ส่ง POST ไปที่ API ตัวเอง
+            response = requests.post("http://127.0.0.1:10000/api/upload-json", json=json_content)
+
+            if response.status_code == 200:
+                print(f"✅ อัปโหลด JSON อัตโนมัติสำเร็จ")
+            else:
+                print(f"❌ Upload JSON ล้มเหลว")
+        except Exception as e:
+            print("❌ อัปโหลด JSON อัตโนมัติผิดพลาด:", str(e))
+    else:
+        print("⚠️ ไม่มีไฟล์ JSON บน Disk ตอนเริ่มระบบ")
+
+
 @app.before_first_request
 def upload_json_when_ready():
     threading.Thread(target=auto_upload_json_on_startup).start()
@@ -108,25 +127,6 @@ def callback():
 JSON_PATH = os.path.expanduser("~/Documents/OutlookStock/data_ready.json")   
 
 json_data = []  # ตัวแปรสำหรับเก็บ JSON ที่ upload เข้ามา
-
-def auto_upload_json_on_startup():
-    if os.path.exists(JSON_PATH):
-        try:
-            with open(JSON_PATH, "r", encoding="utf-8") as f:
-                json_content = json.load(f)
-
-            # ส่ง POST ไปที่ API ตัวเอง
-            response = requests.post("http://127.0.0.1:10000/api/upload-json", json=json_content)
-
-            if response.status_code == 200:
-                print(f"✅ อัปโหลด JSON อัตโนมัติสำเร็จ")
-            else:
-                print(f"❌ Upload JSON ล้มเหลว")
-        except Exception as e:
-            print("❌ อัปโหลด JSON อัตโนมัติผิดพลาด:", str(e))
-    else:
-        print("⚠️ ไม่มีไฟล์ JSON บน Disk ตอนเริ่มระบบ")
-
 
 if os.path.exists(JSON_PATH):
     try:
