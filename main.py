@@ -118,6 +118,17 @@ def upload_json():
     except Exception as e:
         print("ERROR:", str(e)) 
         return jsonify({"status": "error", "message": str(e)}), 500
+    
+@app.route("/api/upload-log", methods=["POST"])
+def upload_log():
+    try:
+        data = request.get_json()
+        msg = data.get("message", "📋 ไม่มีข้อความ")
+        timestamp = data.get("time", datetime.now().isoformat())
+        print(f"{timestamp} | {msg}", flush=True)
+        return jsonify({"status": "received"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/", methods=["GET", "HEAD"])
 def home():
