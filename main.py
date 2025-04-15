@@ -116,7 +116,7 @@ def upload_json():
 def home():
     user_agent = request.headers.get("User-Agent", "")
     if "UptimeRobot" in user_agent:
-        print("📡 ตรวจพบการ Ping จาก UptimeRobot")
+        print(f"✅ UptimeRobot Ping at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         return "Ping จาก UptimeRobot", 200
     return "ระบบพร้อมทำงานแล้ว!", 200
 
