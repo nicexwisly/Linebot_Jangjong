@@ -101,6 +101,13 @@ def callback():
     
 json_data = []  # ตัวแปรสำหรับเก็บ JSON ที่ upload เข้ามา
 
+@app.before_request
+def log_uptime_ping():
+    user_agent = request.headers.get("User-Agent", "")
+    if request.method == "HEAD" and "UptimeRobot" in user_agent:
+        from datetime import datetime
+        print(f"📡 Ping จาก UptimeRobot at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
+
 @app.route("/api/upload-json", methods=["POST"])
 def upload_json():
     global json_data
