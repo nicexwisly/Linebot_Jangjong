@@ -129,14 +129,14 @@ if os.path.exists(JSON_PATH):
         with open(JSON_PATH, "r", encoding="utf-8") as f:
             json_data = json.load(f)
         print(f"✅ Loaded JSON from disk success")
-        
-        # ✅ เรียก upload อัตโนมัติ
-        threading.Thread(target=auto_upload_json_on_startup).start()
-
     except Exception as e:
-        print(f"❌ Failed to load JSON")
+        print(f"❌ Failed to load JSON: {str(e)}")
 else:
     print("⚠️ ไม่มีไฟล์ JSON บน Disk")
+
+@app.before_first_request
+def upload_json_when_ready():
+    threading.Thread(target=auto_upload_json_on_startup).start()
 
 @app.before_request
 def log_uptime_ping():
