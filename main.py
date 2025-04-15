@@ -3,6 +3,8 @@ import pandas as pd
 import os
 import requests
 from datetime import datetime
+import threading
+import json
 
 app = Flask(__name__)
 
@@ -103,11 +105,34 @@ JSON_PATH = os.path.expanduser("~/Documents/OutlookStock/data_ready.json")
 
 json_data = []  # ตัวแปรสำหรับเก็บ JSON ที่ upload เข้ามา
 
+def auto_upload_json_on_startup():
+    if os.path.exists(JSON_PATH):
+        try:
+            with open(JSON_PATH, "r", encoding="utf-8") as f:
+                json_content = json.load(f)
+
+            # ส่ง POST ไปที่ API ตัวเอง
+            response = requests.post("http://127.0.0.1:10000/api/upload-json", json=json_content)
+
+            if response.status_code == 200:
+                print(f"✅ อัปโหลด JSON อัตโนมัติสำเร็จ")
+            else:
+                print(f"❌ Upload JSON ล้มเหลว")
+        except Exception as e:
+            print("❌ อัปโหลด JSON อัตโนมัติผิดพลาด:", str(e))
+    else:
+        print("⚠️ ไม่มีไฟล์ JSON บน Disk ตอนเริ่มระบบ")
+
+
 if os.path.exists(JSON_PATH):
     try:
         with open(JSON_PATH, "r", encoding="utf-8") as f:
             json_data = json.load(f)
         print(f"✅ Loaded JSON from disk success")
+        
+        # ✅ เรียก upload อัตโนมัติ
+        threading.Thread(target=auto_upload_json_on_startup).start()
+
     except Exception as e:
         print(f"❌ Failed to load JSON")
 else:
@@ -134,10 +159,6 @@ def upload_json():
 @app.route("/", methods=["GET", "HEAD"])
 def home():
     user_agent = request.headers.get("User-Agent", "")
-    if "UptimeRobot" in user_agent:
-        print(f"✅ UptimeRobot Ping at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        return "Ping จาก UptimeRobot", 200
-    return "ระบบพร้อมทำงานแล้ว!", 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)  # ✅ debug=Truez   
