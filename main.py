@@ -19,7 +19,6 @@ def reply_to_line(reply_token, message):
         "messages": [{"type": "text", "text": message}]
     }
     r = requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=body)
-    print("LINE API response:", r.status_code, r.text)
 
 @app.route("/api/upload-file", methods=["POST"])
 def upload_file():
@@ -107,7 +106,7 @@ def upload_json():
     global json_data
     try:
         json_data = request.get_json()
-        print("✅ ได้รับ JSON แล้ว:", len(json_data), "รายการ", flush=True)
+        print("✅ Upload Json success:", flush=True)
         return jsonify({"status": "success"})
     except Exception as e:
         print("ERROR:", str(e)) 
