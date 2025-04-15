@@ -107,7 +107,7 @@ def upload_json():
     global json_data
     try:
         json_data = request.get_json()
-        print("✅ ได้รับ JSON แล้ว:", len(json_data), "รายการ")
+        print("✅ ได้รับ JSON แล้ว:", len(json_data), "รายการ", flush=True)
         return jsonify({"status": "success"})
     except Exception as e:
         print("ERROR:", str(e)) 
