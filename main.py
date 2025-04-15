@@ -3,33 +3,8 @@ import pandas as pd
 import os
 import requests
 from datetime import datetime
-import threading
-import json
 
 app = Flask(__name__)
-
-def auto_upload_json_on_startup():
-    if os.path.exists(JSON_PATH):
-        try:
-            with open(JSON_PATH, "r", encoding="utf-8") as f:
-                json_content = json.load(f)
-
-            # ส่ง POST ไปที่ API ตัวเอง
-            response = requests.post("http://127.0.0.1:10000/api/upload-json", json=json_content)
-
-            if response.status_code == 200:
-                print(f"✅ อัปโหลด JSON อัตโนมัติสำเร็จ")
-            else:
-                print(f"❌ Upload JSON ล้มเหลว")
-        except Exception as e:
-            print("❌ อัปโหลด JSON อัตโนมัติผิดพลาด:", str(e))
-    else:
-        print("⚠️ ไม่มีไฟล์ JSON บน Disk ตอนเริ่มระบบ")
-
-
-@app.before_first_request
-def upload_json_when_ready():
-    threading.Thread(target=auto_upload_json_on_startup).start()
 
 FILE_NAME = "data.xlsx"
 LINE_ACCESS_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN") or "YEECvUaqmXwCfMq2iFPTrzctFgj/BBMLcalaHei2myZT+9mOheNn8QFzwNPA6zvWrD/F5BSXgZ7noMupqPXgTzetpUAswQ3as+BY2Az/GYE3JCKAMhlhc3ayOvk/tW7tiwDS/9RYz12PKOZ9z4nTBwdB04t89/1O/w1cDnyilFU="
@@ -124,19 +99,7 @@ def callback():
         print("❌ Error:", str(e))
         return jsonify({"error": str(e)}), 500
 
-JSON_PATH = os.path.expanduser("~/Documents/OutlookStock/data_ready.json")   
-
 json_data = []  # ตัวแปรสำหรับเก็บ JSON ที่ upload เข้ามา
-
-if os.path.exists(JSON_PATH):
-    try:
-        with open(JSON_PATH, "r", encoding="utf-8") as f:
-            json_data = json.load(f)
-        print(f"✅ Loaded JSON from disk success")
-    except Exception as e:
-        print(f"❌ Failed to load JSON: {str(e)}")
-else:
-    print("⚠️ ไม่มีไฟล์ JSON บน Disk")
 
 @app.before_request
 def log_uptime_ping():
