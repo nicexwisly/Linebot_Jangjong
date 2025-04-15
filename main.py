@@ -106,7 +106,7 @@ def log_uptime_ping():
     user_agent = request.headers.get("User-Agent", "")
     if request.method == "HEAD" and "UptimeRobot" in user_agent:
         from datetime import datetime
-        print(f"📡 Ping จาก UptimeRobot at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
+        print(f"✅ Ping จาก UptimeRobot at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
 
 @app.route("/api/upload-json", methods=["POST"])
 def upload_json():
@@ -126,6 +126,17 @@ def home():
         print(f"✅ UptimeRobot Ping at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         return "Ping จาก UptimeRobot", 200
     return "ระบบพร้อมทำงานแล้ว!", 200
+
+@app.route("/api/json-status", methods=["GET", "HEAD"])
+def json_status():
+    json_exists = os.path.exists("data_ready.json")
+    status_text = "✅ JSON พร้อมใช้งาน" if json_exists else "❌ ไม่พบไฟล์ JSON"
+    print(f"[UptimeRobot] Ping /api/json-status → {status_text}", flush=True)
+    
+    return (
+        jsonify({"json_exists": json_exists}),
+        200 if json_exists else 503  # ใช้ 503 ถ้าไม่มีไฟล์
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000, debug=True)  # ✅ debug=Truez   
