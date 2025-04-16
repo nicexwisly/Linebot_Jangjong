@@ -41,9 +41,13 @@ def search_product(keyword):
     keyword = keyword.strip().lower().replace(" ", "")
     results = []
 
+    is_plu_search = keyword.startswith("plu")
+    search_value = keyword[3:] if is_plu_search else keyword
+
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
         item_id = str(row.get("ไอเท็ม", "")).split(".")[0]
+        plu = str(row.get("PLU", "")).strip()
         stock_raw = row.get("มี Stock อยู่ที่", "").replace("~", "").strip()
 
         try:
@@ -51,28 +55,32 @@ def search_product(keyword):
         except ValueError:
             continue
 
-        # ✅ ย้าย if เข้ามาใน loop
-        if keyword in name or keyword in item_id:
-            if stock != 0:
+        if stock == 0:
+            continue
+
+        if is_plu_search:
+            if search_value == plu:
+                results.append(row)
+        else:
+            if search_value in name or search_value in item_id:
                 results.append(row)
 
     if not results:
-        return f"❌ ไม่พบสินค้าหรือไอเท็ม \"{keyword}\" กรุณาลองอีกครั้ง"
-    
-    MAX_LINE_LENGTH = 4500  # กันไว้ก่อน 5,000 ตัว
+        return f"❌ ไม่พบสินค้า '{keyword}' กรุณาลองใหม่อีกครั้ง"
 
+    MAX_LINE_LENGTH = 4500
     lines = [
-    f"- {r.get('ไอเท็ม', '')} | PLU: {r.get('PLU', 'ไม่พบ')} | {r.get('สินค้า', '')} | {r.get('ราคา', '')} บาท | เหลือ {r.get('มี Stock อยู่ที่', '')} ชิ้น | On {r.get('On Order', '')} mu"
-    for r in results
-]
+        f"- {r.get('ไอเท็ม', '')} | PLU: {r.get('PLU', 'ไม่พบ')} | {r.get('สินค้า', '')} | {r.get('ราคา', '')} บาท | เหลือ {r.get('มี Stock อยู่ที่', '')} ชิ้น | On {r.get('On Order', '')} mu"
+        for r in results
+    ]
 
     full_message = "\n\n".join(lines)
     if len(full_message) > MAX_LINE_LENGTH:
         return (
-        f"❗️พบรายการสินค้าที่มีคำว่า \"{keyword}\" ทั้งหมด {len(results)} รายการ\n"
-        f"ทำให้ไม่สามารถแสดงรายการทั้งหมดได้\n"
-        f"กรุณาระบุสินค้าให้เฉพาะเจาะจงขึ้นหรือรหัสสินค้า"
-    )
+            f"❗️พบรายการสินค้าที่มีคำว่า \"{keyword}\" ทั้งหมด {len(results)} รายการ\n"
+            f"ทำให้ไม่สามารถแสดงรายการทั้งหมดได้\n"
+            f"กรุณาระบุสินค้าให้เฉพาะเจาะจงขึ้นหรือรหัสสินค้า"
+        )
 
     return full_message
 
