@@ -129,6 +129,14 @@ def upload_log():
         return jsonify({"status": "received"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+    
+@app.route("/api/logs", methods=["GET"])
+def get_logs():
+    try:
+        with open("log.txt", "r", encoding="utf-8") as f:
+            return f.read()
+    except:
+        return "❌ ไม่พบ log"  
 
 @app.route("/", methods=["GET", "HEAD"])
 def home():
