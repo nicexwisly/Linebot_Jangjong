@@ -78,13 +78,19 @@ def search_product(keyword):
 
     full_message = "\n\n".join(lines)
     if len(full_message) > MAX_LINE_LENGTH:
-        top_results = sorted(results, key=lambda r: float(str(r.get("มี Stock อยู่ที่", "0")).replace("~", "").strip()), reverse=True)[:10]
+        top_results = sorted(
+        results,
+        key=lambda r: float(str(r.get("มี Stock อยู่ที่", "0")).replace("~", "").strip()),
+        reverse=True
+        )[:10]
 
         top_lines = [
         f"- {r['ไอเท็ม']} | {r['สินค้า']} | {r['ราคา']} บาท | เหลือ {r['มี Stock อยู่ที่']} ชิ้น | On {r['On Order']} mu"
         for r in top_results
     ]
-        
+
+        return "\n\n".join(top_lines)
+
     return full_message
 
 @app.route("/callback", methods=["POST"])
