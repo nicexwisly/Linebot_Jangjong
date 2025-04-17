@@ -78,11 +78,18 @@ def search_product(keyword):
 
     full_message = "\n\n".join(lines)
     if len(full_message) > MAX_LINE_LENGTH:
+        top_results = sorted(results, key=lambda r: float(str(r.get("มี Stock อยู่ที่", "0")).replace("~", "").strip()), reverse=True)[:10]
+
+        top_lines = [
+        f"- {r['ไอเท็ม']} | {r['สินค้า']} | {r['ราคา']} บาท | เหลือ {r['มี Stock อยู่ที่']} ชิ้น | On {r['On Order']} mu"
+        for r in top_results
+    ]
+        
         return (
             f"❗️พบรายการสินค้าที่มีคำว่า \"{keyword}\" ทั้งหมด {len(results)} รายการ\n"
-            f"ทำให้ไม่สามารถแสดงรายการทั้งหมดได้\n"
-            f"กรุณาระบุสินค้าให้เฉพาะเจาะจงขึ้นหรือรหัสสินค้า"
-        )
+            f"จึงแสดงเฉพาะ 10 รายการที่มี Stock มากที่สุด:\n\n" +
+            "\n\n".join(top_lines)
+    )
 
     return full_message
 
