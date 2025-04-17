@@ -55,8 +55,8 @@ def search_product(keyword):
         except ValueError:
             continue
 
-        if stock == 0:
-            continue
+        # if stock == 0:
+        #    continue
 
         if is_plu_search:
             if search_value == plu:
