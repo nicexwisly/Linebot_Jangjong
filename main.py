@@ -85,12 +85,6 @@ def search_product(keyword):
         for r in top_results
     ]
         
-        return (
-            f"❗️พบรายการสินค้าที่มีคำว่า \"{keyword}\" ทั้งหมด {len(results)} รายการ\n"
-            f"จึงแสดงเฉพาะ 10 รายการที่มี Stock มากที่สุด:\n\n" +
-            "\n\n".join(top_lines)
-    )
-
     return full_message
 
 @app.route("/callback", methods=["POST"])
