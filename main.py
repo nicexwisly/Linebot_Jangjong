@@ -67,6 +67,8 @@ def search_product(keyword):
 
     if not results:
         return f"❌ ไม่พบสินค้า '{keyword}' กรุณาลองใหม่อีกครั้ง"
+    
+    results = sorted(results, key=lambda r: float(str(r.get("มี Stock อยู่ที่", "0")).replace("~", "").strip()), reverse=True)
 
     MAX_LINE_LENGTH = 4500
     lines = [
